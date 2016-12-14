@@ -1,13 +1,71 @@
-apply plugin: 'java'
-apply plugin: 'war'
-apply plugin: 'eclipse-wtp'
+buildscript {
+  repositories {
+    jcenter()
+  }
+
+  dependencies {
+    classpath 'org.akhikhl.gretty:gretty:1.4.0'
+  }
+}
 
 repositories {
+  jcenter()
+}
+apply plugin: 'java'
+apply plugin: 'war'
+if (!project.plugins.findPlugin(org.akhikhl.gretty.GrettyPlugin))
+  project.apply(plugin: org.akhikhl.gretty.GrettyPlugin)
+apply plugin: 'eclipse-wtp'
+
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
+
+tasks.withType(JavaCompile) {
+	it.options*.encoding = 'UTF-8'
+}
+
+archivesBaseName = 'scheduler'
+
+repositories {
+	maven {
+		name = 'java.net maven public repo'
+		url = 'https://maven.java.net/content/groups/public/'
+	}
 	mavenCentral()
 	jcenter()
 }
 
 dependencies {
+	providedCompile 'javax.servlet:servlet-api:2.5'
+
 	compile 'org.glassfish.jersey.core:jersey-server:2.24'
 	compile 'org.glassfish.jersey.media:jersey-media-multipart:2.24'
+	compile 'org.glassfish.jersey.security:oauth2-client:2.24'
+	compile 'org.glassfish.jersey.media:jersey-media-json-jackson:2.24'
+	compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.24'
+	compile 'org.glassfish.jersey.media:jersey-media-sse:2.24'
+	compile 'org.glassfish.jersey.media:jersey-media-json-processing:2.24'
+	
+	compile 'com.fasterxml.jackson.core:jackson-databind:2.8.5'
+	compile 'com.fasterxml.jackson.jaxrs:jackson-jaxrs-providers:2.8.5'
+	
+	compile 'org.hsqldb:hsqldb:2.3.4'
+	
+	compile 'org.jdbi:jdbi:2.77'
+	
+	testCompile 'junit:junit:4.12'
+}
+
+gretty {
+	contextPath = 'scheduler'
+}
+
+eclipse {
+	wtp {
+		facet {
+			facets = []
+			facet name: 'java', version: '1.8'
+			facet name: 'jst.web', version: '3.1'
+		}
+	}
 }
